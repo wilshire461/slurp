@@ -1,10 +1,9 @@
 import sys
-import urllib.parse
-import urllib.request
+import urllib
+import urllib2
 import json
 import datetime
 import subprocess
-from collections import OrderedDict
 
 import settings
 
@@ -53,7 +52,7 @@ def run_slurm_cmd(cmd, exit_on_failure=False):
             stderr=subprocess.PIPE
         )
         stdout, stderr = p.communicate()
-        if stderr != b'':
+        if stderr != '':
             raise subprocess.CalledProcessError(
                 p.returncode,
                 subprocess.list2cmdline(cmd),
@@ -61,7 +60,7 @@ def run_slurm_cmd(cmd, exit_on_failure=False):
             )
         return stdout
 
-    except FileNotFoundError:
+    except OSError:
         err_msg = "Slurm not found! Exiting...\n"
         exit_with_msg(err_msg)
 
@@ -123,13 +122,13 @@ try:
     query_args = {
         'format':'json',
     }
-    data = urllib.parse.urlencode(query_args)
+    data = urllib.urlencode(query_args)
     url = '{}?{}'.format(settings.ALLOC_URL,data)
-    req = urllib.request.Request(url)
-    res = urllib.request.urlopen(req)
+    req = urllib2.Request(url)
+    res = urllib2.urlopen(req)
     res_json = res.read()
 
-    allocations = json.loads(res_json.decode('utf-8'))
+    allocations = json.loads(res_json)
 
 except Exception as e:
     err_msg = 'Error while querying API.\n{}\n'.format(e)
