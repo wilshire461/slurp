@@ -38,6 +38,7 @@ def exit_with_msg(err_msg):
     sys.exit(1)
 
 def log_error(err_msg):
+    global err_cnt
     err_cnt += 1
     err_msg_ts = '{}: {}\n'.format(datetime.datetime.now(),err_msg)
     sys.stderr.write(err_msg_ts)
