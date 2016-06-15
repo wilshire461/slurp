@@ -49,8 +49,12 @@ for alloc in allocations:
     #
     # sacctmgr show account <account_name>
     try:
-        cmd = ['sacctmgr','show','account',alloc['allocation_id']]
-        p = subprocess.run(cmd,check=True)
+        cmd = subprocess.Popen(
+            ['sacctmgr','show','account',alloc['allocation_id']],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        p = cmd.communicate()
 
     except FileNotFoundError:
         err_msg = "Slurm not found! Exiting...\n"
