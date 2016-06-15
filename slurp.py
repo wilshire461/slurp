@@ -4,6 +4,7 @@ import urllib2
 import json
 import datetime
 import subprocess
+import ast
 
 import settings
 
@@ -158,7 +159,7 @@ for alloc in allocations:
 
     # Add/remove users from allocation/account
     #
-    pusers = alloc['project']['collaborators'].split(',')
+    pusers = ast.literal_eval(alloc['project']['collaborators'])
     susers = slurm_state[proj_id]['users']
     # Compute adds
     adds = set(pusers) - set(susers)
