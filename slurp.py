@@ -177,6 +177,7 @@ for alloc in allocations:
         if proj_id in GENERAL_ACCOUNTS:
             def_acct = 'defaultaccount={}'.format(proj_id)
             cmd.append(def_acct)
+        output = run_slurm_cmd(cmd)
     if len(removes) > 0:
         cmd = [
             'sacctmgr',
@@ -186,3 +187,4 @@ for alloc in allocations:
             ','.join(removes),
             'account={}'.format(proj_id),
         ]
+        output = run_slurm_cmd(cmd)
