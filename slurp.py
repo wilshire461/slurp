@@ -186,6 +186,40 @@ for alloc in allocations:
         }
         slurm_state[parsed[0]] = d
 
+    # Determine whether or not the account is expired
+    # or deactivated. If it is, set max_jobs=0.
+    disable = False
+    if alloc['project']['deactivated']:
+        disable = True
+    now = datetime.datetime.now()
+    sdate = datetime.strptime(alloc['start_date'],'%Y-%m-%d')
+    edate = datetime.strptime(alloc['end_date'],'%Y-%m-%d')
+    if not sdate < now < edate:
+        disable = True
+
+    if disable:
+        cmd = [
+            'sacctmgr',
+            '-i',
+            'update',
+            'account={}'.format(proj_id),
+            'set',
+            'maxjobs=0',
+            CLUSTER,
+        ]
+        output = run_slurm_cmd(cmd)
+    elif (not disable) and (slurm_state[proj_id]['maxjobs'] == '0'):
+        cmd = [
+            'sacctmgr',
+            '-i',
+            'update',
+            'account={}'.format(proj_id),
+            'set',
+            'maxjobs=-1',
+            CLUSTER,
+        ]
+        output = run_slurm_cmd(cmd)
+
     # Add/remove users from allocation/account
     #
     pusers = ast.literal_eval(alloc['project']['collaborators'])
