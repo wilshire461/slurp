@@ -14,6 +14,10 @@ import settings
 ERROR_THRESHOLD = 10
 err_cnt = 0
 
+CLUSTER = 'cluster={}'.format(settings.CLUSTER_NAME)
+FORMAT = 'format=account,user,maxjobs,qos,{}'.format(settings.AMOUNT_ATTRIBUTE)
+AMOUNT = settings.AMOUNT_ATTRIBUTE
+
 # Top Levels
 TOP_LEVELS = [
     'condo',
@@ -92,8 +96,8 @@ cmd = [
     'sacctmgr',
     'show',
     'ass',
-    'format=account,user,maxjobs,qos,grpcpumins',
-    'cluster=slurmdev',
+    FORMAT,
+    CLUSTER,
     '-n',
     '-P',
 ]
@@ -112,7 +116,7 @@ for e in parsed:
             'users': [],
             'maxjobs': e[2],
             'qos': e[3],
-            'grpcpumins': e[4],
+            AMOUNT: e[4],
         }
         slurm_state[e[0]] = d
     else:
@@ -153,11 +157,11 @@ for alloc in allocations:
             'account',
             proj_id,
             'parent={}'.format(parent),
-            'grpcpumins={}'.format(alloc['amount']),
+            '{}={}'.format(AMOUNT,alloc['amount']),
             'defaultqos=normal',
             qoses,
             'where',
-            'cluster=slurmdev',
+            CLUSTER,
         ]
         output = run_slurm_cmd(cmd)
 
@@ -166,8 +170,8 @@ for alloc in allocations:
             'sacctmgr',
             'show',
             'ass',
-            'format=account,user,maxjobs,qos,grpcpumins',
-            'cluster=slurmdev',
+            FORMAT,
+            CLUSTER,
             '-n',
             '-P',
             'account={}'.format(proj_id),
@@ -178,7 +182,7 @@ for alloc in allocations:
             'users': [],
             'maxjobs': parsed[2],
             'qos': parsed[3],
-            'grpcpumins': parsed[4],
+            AMOUNT: parsed[4],
         }
         slurm_state[parsed[0]] = d
 
@@ -198,6 +202,7 @@ for alloc in allocations:
             'user',
             ','.join(adds),
             'account={}'.format(proj_id),
+            CLUSTER,
         ]
         if proj_id in GENERAL_ACCOUNTS:
             def_acct = 'defaultaccount={}'.format(proj_id)
@@ -211,5 +216,6 @@ for alloc in allocations:
             'user',
             ','.join(removes),
             'account={}'.format(proj_id),
+            CLUSTER,
         ]
         output = run_slurm_cmd(cmd)
