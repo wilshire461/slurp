@@ -143,6 +143,9 @@ for alloc in allocations:
     # Check if allocation/account exists in Slurm
     # otherwise add account to Slurm.
     if alloc['project']['project_id'] not in slurm_state:
+        qoses = 'qos=normal,long,debug'
+        if alloc['project']['qos_addenda'] != '':
+            'qos=normal,long,debug,{}'.format(alloc['project']['qos_addenda'])
         cmd = [
             'sacctmgr',
             'add',
@@ -152,7 +155,7 @@ for alloc in allocations:
             'parent={}'.format(parent),
             'grpcpumins={}'.format(alloc['amount']),
             'defaultqos=normal',
-            'qos=normal,long,debug,{}'.format(alloc['project']['qos_addenda']),
+            qoses,
             'where',
             'cluster=slurmdev',
         ]
