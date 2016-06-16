@@ -282,7 +282,7 @@ for alloc in allocations:
         output = run_slurm_cmd(cmd)
 
     # amount
-    if alloc['amount'] != slurm_state[AMOUNT]:
+    if alloc['amount'] != slurm_state[proj_id][AMOUNT]:
         cmd = [
             'sacctmgr',
             '-i',
