@@ -161,6 +161,27 @@ for alloc in allocations:
         ]
         output = run_slurm_cmd(cmd)
 
+        # Add the newly-created account to slurm state and continue.
+        cmd = [
+            'sacctmgr',
+            'show',
+            'ass',
+            'format=account,user,maxjobs,qos,grpcpumins',
+            'cluster=slurmdev',
+            '-n',
+            '-P',
+            'account={}'.format(proj_id),
+        ]
+        output = run_slurm_cmd(cmd, exit_on_failure=True)
+        parsed = output.split('|')
+        d = {
+            'users': [],
+            'maxjobs': parsed[2],
+            'qos': parsed[3],
+            'grpcpumins': parsed[4],
+        }
+        slurm_state[parsed[0]] = d
+
     # Add/remove users from allocation/account
     #
     pusers = ast.literal_eval(alloc['project']['collaborators'])
