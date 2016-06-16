@@ -17,6 +17,7 @@ err_cnt = 0
 CLUSTER = 'cluster={}'.format(settings.CLUSTER_NAME)
 FORMAT = 'format=account,user,maxjobs,qos,{}'.format(settings.AMOUNT_ATTRIBUTE)
 AMOUNT = settings.AMOUNT_ATTRIBUTE
+DEFAULT_QOS = 'normal,long,debug'
 
 # Top Levels
 TOP_LEVELS = [
@@ -149,7 +150,7 @@ for alloc in allocations:
     if alloc['project']['project_id'] not in slurm_state:
         qoses = 'qos=normal,long,debug'
         if alloc['project']['qos_addenda'] != '':
-            'qos=normal,long,debug,{}'.format(alloc['project']['qos_addenda'])
+            '{},{}'.format(DEFAULT_QOS,alloc['project']['qos_addenda'])
         cmd = [
             'sacctmgr',
             'add',
@@ -254,6 +255,43 @@ for alloc in allocations:
             'user',
             ','.join(removes),
             'account={}'.format(proj_id),
+            CLUSTER,
+        ]
+        output = run_slurm_cmd(cmd)
+
+    # Check for differences between allocation/project in portal
+    # and in Slurm. Update if definitions do not match.
+    def_qos = DEFAULT_QOS.split(',')
+    sqos = slurm_state[proj_id]['qos'].split(',')
+    sqos_addenda = set(sqos)-set(def_qos)
+    pqos_addenda = []
+    if alloc['project']['qos_addenda'] != '':
+        pqos_addenda = alloc['project']['qos_addenda'].split(',')
+    if pqos_addenda.sort() != sqos_addenda.sort():
+        cmd = [
+            'sacctmgr',
+            '-i',
+            'update',
+            'account',
+            proj_id,
+            'set',
+            'qos={}'.format(','.join([DEFAULT_QOS]+pqos_addenda)),
+            'where',
+            CLUSTER,
+        ]
+        output = run_slurm_cmd(cmd)
+
+    # amount
+    if alloc['amount'] != slurm_state[AMOUNT]:
+        cmd = [
+            'sacctmgr',
+            '-i',
+            'update',
+            'account',
+            proj_id,
+            'set',
+            '{}={}'.format(AMOUNT,alloc['amount']),
+            'where',
             CLUSTER,
         ]
         output = run_slurm_cmd(cmd)
