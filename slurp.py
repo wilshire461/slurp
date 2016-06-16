@@ -263,7 +263,7 @@ for alloc in allocations:
     # and in Slurm. Update if definitions do not match.
     def_qos = DEFAULT_QOS.split(',')
     sqos = slurm_state[proj_id]['qos'].split(',')
-    sqos_addenda = set(sqos)-set(def_qos)
+    sqos_addenda = list(set(sqos)-set(def_qos))
     pqos_addenda = []
     if alloc['project']['qos_addenda'] != '':
         pqos_addenda = alloc['project']['qos_addenda'].split(',')
