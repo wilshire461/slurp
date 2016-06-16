@@ -267,7 +267,7 @@ for alloc in allocations:
     pqos_addenda = []
     if alloc['project']['qos_addenda'] != '':
         pqos_addenda = alloc['project']['qos_addenda'].split(',')
-    if pqos_addenda.sort() != sqos_addenda.sort():
+    if sorted(pqos_addenda) != sorted(sqos_addenda):
         cmd = [
             'sacctmgr',
             '-i',
