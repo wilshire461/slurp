@@ -82,8 +82,8 @@ def get_top_level(alloc):
     # Return the appropriate top-level given an allocation
 
     # Parent has been explicitly specified
-    if 'parent' in alloc:
-        return alloc['project']['parent']
+    if 'parent_account' in alloc['project']:
+        return alloc['project']['parent_account']
     # Automatically determine from allocation_id
     if alloc['project']['project_id'].startswith('ucb'):
         return 'ucballoc'
