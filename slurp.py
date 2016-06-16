@@ -192,8 +192,8 @@ for alloc in allocations:
     if alloc['project']['deactivated']:
         disable = True
     now = datetime.datetime.now()
-    sdate = datetime.strptime(alloc['start_date'],'%Y-%m-%d')
-    edate = datetime.strptime(alloc['end_date'],'%Y-%m-%d')
+    sdate = datetime.datetime.strptime(alloc['start_date'],'%Y-%m-%d')
+    edate = datetime.datetime.strptime(alloc['end_date'],'%Y-%m-%d')
     if not sdate < now < edate:
         disable = True
 
