@@ -206,6 +206,7 @@ for alloc in allocations:
             proj_id,
             'set',
             'maxjobs=0',
+            'where',
             CLUSTER,
         ]
         output = run_slurm_cmd(cmd)
@@ -218,6 +219,7 @@ for alloc in allocations:
             proj_id,
             'set',
             'maxjobs=-1',
+            'where',
             CLUSTER,
         ]
         output = run_slurm_cmd(cmd)
