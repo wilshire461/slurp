@@ -4,10 +4,19 @@ import urllib2
 import json
 import datetime
 import subprocess
+import argparse
 import ast
 
 import settings
 
+parser = argparse.ArgumentParser(
+    description='Slurp is a Slurm state manager. Slurp pulls from RCAMP and LDAP, and reconciles that data into Slurm state.'
+)
+parser.add_argument("-d", "--debug", help="run the script,but instead of implementing the state in slurm, print to stdout instead", action="store_true")
+
+args = parser.parse_args()
+if args.debug:
+    SACCTMGR = 'echo'
 
 
 # Max errors that can be encountered before slurp exits
@@ -94,7 +103,7 @@ def get_top_level(alloc):
 
 # Get Slurm State
 cmd = [
-    'sacctmgr',
+    SACCTMGR,
     'show',
     'ass',
     FORMAT,
@@ -152,7 +161,7 @@ for alloc in allocations:
         if alloc['project']['qos_addenda'] != '':
             '{},{}'.format(DEFAULT_QOS,alloc['project']['qos_addenda'])
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             'add',
             '-i',
             'account',
@@ -168,7 +177,7 @@ for alloc in allocations:
 
         # Add the newly-created account to slurm state and continue.
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             'show',
             'ass',
             FORMAT,
@@ -200,7 +209,7 @@ for alloc in allocations:
 
     if disable:
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             '-i',
             'update',
             'account',
@@ -213,7 +222,7 @@ for alloc in allocations:
         output = run_slurm_cmd(cmd)
     elif (not disable) and (slurm_state[proj_id]['maxjobs'] == '0'):
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             '-i',
             'update',
             'account',
@@ -235,7 +244,7 @@ for alloc in allocations:
     removes = set(susers) - set(pusers)
     if len(adds) > 0:
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             '-i',
             'add',
             'user',
@@ -249,7 +258,7 @@ for alloc in allocations:
         output = run_slurm_cmd(cmd)
     if len(removes) > 0:
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             '-i',
             'remove',
             'user',
@@ -269,7 +278,7 @@ for alloc in allocations:
         pqos_addenda = alloc['project']['qos_addenda'].split(',')
     if sorted(pqos_addenda) != sorted(sqos_addenda):
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             '-i',
             'update',
             'account',
@@ -284,7 +293,7 @@ for alloc in allocations:
     # amount
     if alloc['amount'] != slurm_state[proj_id][AMOUNT]:
         cmd = [
-            'sacctmgr',
+            SACCTMGR,
             '-i',
             'update',
             'account',
