@@ -1,11 +1,11 @@
 # slurp
 Slurp is a Slurm state manager. Slurp pulls from RCAMP and LDAP, and reconciles that data into Slurm state.
 
-Usage:
+##Usage:
 
 DO NOT EDIT settings.py, instead create a file called local_settings.py and fill it with the variables you want to change
 
-Variables:
+##Variables:
 
 ALLOC_URL
 This variable tells slurp where to go to grab allocation data from the RCAMP API.
